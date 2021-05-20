@@ -7,8 +7,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from rouge import Rouge
 from nltk import RegexpTokenizer
+from transformers import BertModel, BertTokenizerFast
 import torch.nn.functional as F
-
+import utils
+import kiwi
 
 #https://machinelearningmastery.com/calculate-bleu-score-for-text-python/
 
@@ -122,6 +124,7 @@ def labse(df, language1, language2):
 
     source_embeddings = source_outputs.pooler_output
     translation_embeddings = translation_outputs.pooler_output
+    return source_embeddings, translation_embeddings
 
 def similarity(embeddings_1, embeddings_2):
     normalized_embeddings_1 = F.normalize(embeddings_1, p=2)
@@ -131,5 +134,14 @@ def similarity(embeddings_1, embeddings_2):
     )
 
 print(similarity(source_embeddings, translation_embeddings))
+
+def openkiwi():
+    # Download and extract pre-trained kiwi models
+
+    OK_url = 'https://github.com/unbabel/KiwiCutter/releases/download/v1.0/estimator_en_de.torch.zip'
+
+    utils.download_kiwi(OK_url)
+
+    model = kiwi.load_model('trained_models/estimator_en_de.torch/estimator_en_de.torch')
 
     

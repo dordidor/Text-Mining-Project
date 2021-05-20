@@ -3,10 +3,11 @@ from mods.models import Classifier
 import json
 from definitions import *
 import warnings
+from utils.data_manager import *
 
 if __name__ == '__main__':
 
-    language_list = [cs_en, de_en, en_fi, en_zh, ru_en, zh_en, en_fi, en_zh]
+    language_list = load_dataset(path)
     preprocess_config = {
         'lemmatize': False,
         'stemmer': False,
