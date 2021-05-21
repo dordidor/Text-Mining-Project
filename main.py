@@ -1,13 +1,11 @@
-from utils.data_manager import build_set_generators
-from mods.models import Classifier
-import json
+
 from definitions import *
 import warnings
 from utils.data_manager import *
 
 if __name__ == '__main__':
 
-    language_list = load_dataset(path)
+    language_list = load_dataset()
     preprocess_config = {
         'lemmatize': False,
         'stemmer': False,
@@ -33,13 +31,12 @@ if __name__ == '__main__':
 
     for df in language_list:
 
-        df["reference"] = [number_token(x) for x in df["reference"]]
-        df["translation"] = [number_token(x) for x in df["translation"]]
-        #TODO
-        updates = clean(df["reference"], lemmatize=preprocess_config['lemmatize'], stemmer=False, stop_words=False, stop=stop_en)
+        number_token(df)
+        
+        updates = clean(df["reference"], lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
         update_df(df, updates, "reference")
 
-        updates = clean(df["translation"], lemmatize=False, stemmer=False, stop_words=False, stop=stop_en)
+        updates = clean(df["translation"], lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
         update_df(df, updates, "translation")
 
         final_df.append(run_models(df))

@@ -1,5 +1,5 @@
 
-from mods.models import METEOR, NIST, ROUGE, baseline_bleu, bleu_rouge, gleu_model
+from mods.models import meteor, nist, rouge, baseline_bleu, bleu_rouge, gleu_model
 from tqdm import tqdm_notebook as tqdm
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -23,14 +23,24 @@ exclude = set(string.punctuation)
 lemma = WordNetLemmatizer()
 snowball_stemmer = SnowballStemmer('english')
 
-def number_token(text):
-    """
-    Function that receives a string of text and returns the string with 
-    the cost formats within it substituted by the token #COST
-    """
-    tokenized_text = re.sub('(\d+|\d+.\d+)(| )','##',text)
-        
-    return tokenized_text
+def number_token(df):
+
+    def transform_number(text):
+        """
+        Function that receives a string of text and returns the string with 
+        the cost formats within it substituted by the token #COST
+        """
+        tokenized_text = re.sub('(\d+|\d+.\d+)(| )','##',text)
+            
+        return tokenized_text
+
+    df["reference"] = [transform_number(x) for x in df["reference"]]
+    df["translation"] = [transform_number(x) for x in df["translation"]]
+
+def tokenize(df):
+    df['reference1'] = [[x.split()] for x in df['reference']]
+    df['translation1'] = [x.split() for x in df['translation']]
+    return df
 
 def clean(text_list, lemmatize=False, stemmer=False, punctuation = False, stop_words=False, stop = stop_en):
     """
@@ -53,7 +63,7 @@ def clean(text_list, lemmatize=False, stemmer=False, punctuation = False, stop_w
             text = re.sub("[^a-zA-Z]", ' ', text)
         
         #REMOVE TAGS (HTML)
-        text = BeautifulSoup(text).get_text()
+        text = BeautifulSoup(text, features='lxml').get_text()
         
         #REMOVE STOP WORDS - not needed 
         if stop_words:
@@ -129,7 +139,7 @@ def run_models(df):
     baseline_bleu(df)
 
     # apply google bleu model
-    gleu_model(df)
+    #gleu_model(df)
 
     # apply NIST model
     nist(df)

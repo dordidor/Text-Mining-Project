@@ -2,15 +2,14 @@ from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 import nltk.translate.gleu_score as sentence_gleu
 from nltk.translate.meteor_score import meteor_score
 from nltk.translate.nist_score import sentence_nist
-from nltk.tokenize import word_tokenize
+#from nltk.tokenize import word_tokenize
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from rouge import Rouge
-from nltk import RegexpTokenizer
+#from nltk import RegexpTokenizer
 from transformers import BertModel, BertTokenizerFast
 import torch.nn.functional as F
-import utils
-import kiwi
+
 
 #https://machinelearningmastery.com/calculate-bleu-score-for-text-python/
 
@@ -70,8 +69,6 @@ def wer(translation, reference, print_matrix=False):
 # measures precision
 def baseline_bleu(df):
     smoothie = SmoothingFunction().method1
-    df['reference1'] = [[x.split()] for x in df['reference']]
-    df['translation1'] = [x.split() for x in df['translation']]
     df['bleu'] = df.apply(lambda x: sentence_bleu(x['reference1'], x['translation1'], weights=(1,0,0,0), smoothing_function=smoothie), axis=1)
     df.drop(columns = ['reference1','translation1'],inplace=True)
     return df 
@@ -84,10 +81,10 @@ def gleu_model(df):
     return df 
 
 def nist(df):
-    df['reference1'] = [[x.split()] for x in df['reference']]
-    df['translation1'] = [x.split() for x in df['translation']]
-    df['nist'] = df.apply(lambda x: sentence_nist(x['reference1'], x['translation1']),axis=1)
-    df.drop(columns = ['reference1','translation1'],inplace=True)
+    #df['reference1'] = [[x.split()] for x in df['reference']]
+    #df['translation1'] = [x.split() for x in df['translation']]
+    df['nist'] = df.apply(lambda x: sentence_nist(x['reference'], x['translation']),axis=1)
+    #df.drop(columns = ['reference','translation'],inplace=True)
     return df 
 
 # measures recall
@@ -126,22 +123,14 @@ def labse(df, language1, language2):
     translation_embeddings = translation_outputs.pooler_output
     return source_embeddings, translation_embeddings
 
-def similarity(embeddings_1, embeddings_2):
-    normalized_embeddings_1 = F.normalize(embeddings_1, p=2)
-    normalized_embeddings_2 = F.normalize(embeddings_2, p=2)
-    return torch.matmul(
-        normalized_embeddings_1, normalized_embeddings_2.transpose(0, 1)
-    )
+    def similarity(embeddings_1, embeddings_2):
+        normalized_embeddings_1 = F.normalize(embeddings_1, p=2)
+        normalized_embeddings_2 = F.normalize(embeddings_2, p=2)
+        return torch.matmul(
+            normalized_embeddings_1, normalized_embeddings_2.transpose(0, 1)
+        )
 
-print(similarity(source_embeddings, translation_embeddings))
+    print(similarity(source_embeddings, translation_embeddings))
 
-def openkiwi():
-    # Download and extract pre-trained kiwi models
-
-    OK_url = 'https://github.com/unbabel/KiwiCutter/releases/download/v1.0/estimator_en_de.torch.zip'
-
-    utils.download_kiwi(OK_url)
-
-    model = kiwi.load_model('trained_models/estimator_en_de.torch/estimator_en_de.torch')
 
     
