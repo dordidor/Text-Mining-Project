@@ -10,9 +10,14 @@ from nltk import RegexpTokenizer
 from transformers import BertModel, BertTokenizerFast
 import torch.nn.functional as F
 import utils
-import kiwi
+#import kiwi
+import numpy as np
 
 #https://machinelearningmastery.com/calculate-bleu-score-for-text-python/
+
+
+
+
 
 def cosine_sim(text):
     vectors = [t for t in get_vectors(text)]

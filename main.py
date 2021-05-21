@@ -1,5 +1,5 @@
 from utils.data_manager import build_set_generators
-from mods.models import Classifier
+#from mods.models import Classifier
 import json
 from definitions import *
 import warnings

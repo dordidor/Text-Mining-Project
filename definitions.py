@@ -1,5 +1,7 @@
 
-from mods.models import METEOR, NIST, ROUGE, baseline_bleu, bleu_rouge, gleu_model
+
+#from mods.models import meteor, nist, rouge, baseline_bleu, bleu_rouge, gleu_model
+
 from tqdm import tqdm_notebook as tqdm
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -16,8 +18,8 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from metrics import *
 import string
 
-stop_en = set(stopwords.words('english'))
-stop_fi = set(stopwords.words('finnish'))
+#stop_en = set(stopwords.words('english'))
+#stop_fi = set(stopwords.words('finnish'))
 # stop_zh = chinese library needed 
 exclude = set(string.punctuation)
 lemma = WordNetLemmatizer()
@@ -32,7 +34,7 @@ def number_token(text):
         
     return tokenized_text
 
-def clean(text_list, lemmatize=False, stemmer=False, punctuation = False, stop_words=False, stop = stop_en):
+def clean(text_list, lemmatize=False, stemmer=False, punctuation = False, stop_words=False, stop = ["a"]):
     """
     Function that a receives a list of strings and preprocesses it.
     
@@ -146,8 +148,8 @@ def run_models(df):
     return df
 
 def evaluate_models(df): # TODO for laser
-    model_list = ['bleu']  # TODO name of column
-    #TODO create empty df (correl_df)
+    model_list = ['wordEmbDistance']  # TODO name of column
+    correl_df = []
     #set indices
     for model in model_list:
         reg = RegressionReport()
