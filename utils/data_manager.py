@@ -1,9 +1,3 @@
-#from definitions import *
-
-import time
-import matplotlib.pyplot as plt
-from IPython.display import display, clear_output
-
 import os
 import pandas as pd
 import numpy as np
@@ -14,12 +8,10 @@ from shutil import rmtree
 from PIL import Image
 from glob import glob
 
-#path = '/corpus'   # use your path
-#all_files = glob.glob(path + "/*.csv")
-import os
-def load_dataset(path):
+
+def load_dataset():
     # dataframes provided with the corresponding language translations
-    
+
     # assign dataset names
     list_of_names = ['cs-en', 'de-en', 'en-fi', 'en-zh', 'ru-en', 'zh-en', 'en-fi', 'en-zh']
 
@@ -28,7 +20,9 @@ def load_dataset(path):
   
     # append datasets into teh list
     for i in range(len(list_of_names)):
-        temp_df = pd.read_csv(os.path.join("..\\corpus\\"+list_of_names[i]+"\\scores.csv"))
+
+        temp_df = pd.read_csv("corpus/"+ list_of_names[i]+"/scores.csv")
+
         dataframes_list.append(temp_df)
 
     return dataframes_list
