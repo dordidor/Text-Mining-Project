@@ -9,6 +9,7 @@ from rouge import Rouge
 #from nltk import RegexpTokenizer
 from transformers import BertModel, BertTokenizerFast
 import torch.nn.functional as F
+import kiwi
 
 
 #https://machinelearningmastery.com/calculate-bleu-score-for-text-python/

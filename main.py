@@ -2,6 +2,7 @@
 from definitions import *
 import warnings
 from utils.data_manager import *
+import jieba
 
 if __name__ == '__main__':
 
@@ -28,10 +29,15 @@ if __name__ == '__main__':
     final_df=[]
     correlations = []
 
+    language_list.remove('en-zh')
 
     for df in language_list:
 
+        df = tokenize(df)
         number_token(df)
+
+        #[jieba.cut(x, cut_all=False) for x in df['reference']]
+        #[jieba.cut(x, cut_all=False) for x in df['translation']]  
         
         updates = clean(df["reference"], lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
         update_df(df, updates, "reference")
@@ -40,7 +46,7 @@ if __name__ == '__main__':
         update_df(df, updates, "translation")
 
         final_df.append(run_models(df))
-        correlations.append(evaluate_models(df))
+        correlations.append(evaluate_models(df))  
 
 
 

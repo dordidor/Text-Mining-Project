@@ -3,12 +3,8 @@ from mods.models import meteor, nist, rouge, baseline_bleu, bleu_rouge, gleu_mod
 from tqdm import tqdm_notebook as tqdm
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
-from nltk.tokenize import word_tokenize
-from nltk.corpus import wordnet
 from nltk.stem import SnowballStemmer
 from bs4 import BeautifulSoup
-from scipy.stats import kendalltau
-from scipy.stats import pearsonr
 import re
 from matplotlib import pyplot
 import pandas as pd
