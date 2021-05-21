@@ -4,3 +4,8 @@ data/
 .quickdrawcache
 *.pyc
 logs/
+*.npy
+*.csv
+*.csv
+*.csv
+corpus/zh-en/scores.csv
