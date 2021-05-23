@@ -17,10 +17,6 @@ import numpy as np
 
 #https://machinelearningmastery.com/calculate-bleu-score-for-text-python/
 
-
-
-
-
 def cosine_sim(text):
     vectors = [t for t in get_vectors(text)]
     return cosine_similarity(vectors)
@@ -77,22 +73,16 @@ def wer(translation, reference, print_matrix=False):
 # measures precision
 def baseline_bleu(df):
     smoothie = SmoothingFunction().method1
-    df['bleu'] = df.apply(lambda x: sentence_bleu(x['reference1'], x['translation1'], weights=(1,0,0,0), smoothing_function=smoothie), axis=1)
-    df.drop(columns = ['reference1','translation1'],inplace=True)
+    df['bleu'] = df.apply(lambda x: sentence_bleu(x['reference_token'], x['translation_token'], weights=(1,0,0,0), smoothing_function=smoothie), axis=1)
     return df 
 
 def gleu_model(df):
-    df['reference1'] = [[x.split()] for x in df['reference']]
-    df['translation1'] = [x.split() for x in df['translation']]
-    df['gleu'] = df.apply(lambda x: sentence_gleu(x['reference1'], x['translation1'], weights=(1,0,0,0)), axis=1)
-    df.drop(columns = ['reference1','translation1'],inplace=True)
+    df['gleu'] = df.apply(lambda x: sentence_gleu(x['reference_token'], x['translation_token'], weights=(1,0,0,0)), axis=1)
     return df 
 
 def nist(df):
-    #df['reference1'] = [[x.split()] for x in df['reference']]
-    #df['translation1'] = [x.split() for x in df['translation']]
+    # tokenization happens inside nist
     df['nist'] = df.apply(lambda x: sentence_nist(x['reference'], x['translation']),axis=1)
-    #df.drop(columns = ['reference','translation'],inplace=True)
     return df 
 
 # measures recall
@@ -100,9 +90,9 @@ def rouge(df):
     df['rouge'] = df.apply(lambda x: Rouge.get_scores(x['translation'], x['reference']),axis=1)
     return df
 
-def bleu_rouge(Bleu, Rouge):
-    F1 = 2 * (Bleu * Rouge) / (Bleu + Rouge)
-    return F1
+def bleu_rouge(df):
+    df['bleu_rouge'] = df.apply(lambda x: 2 * (x['bleu'] * x['rouge']) / (x['bleu'] + x['rouge']))
+    return df
 
 def meteor(df):
     df['meteor'] = df.apply(lambda x: meteor_score([x['reference']], x['translation']),axis=1)

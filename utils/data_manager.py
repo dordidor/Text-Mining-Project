@@ -13,7 +13,7 @@ def load_dataset():
     # dataframes provided with the corresponding language translations
 
     # assign dataset names
-    list_of_names = ['cs-en', 'de-en', 'en-fi', 'en-zh', 'ru-en', 'zh-en', 'en-fi', 'en-zh']
+    list_of_names = ['cs-en', 'de-en', 'ru-en', 'zh-en', 'en-fi', 'en-zh']
 
     # create empty list
     dataframes_list = []

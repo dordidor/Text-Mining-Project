@@ -34,8 +34,8 @@ def number_token(df):
     df["translation"] = [transform_number(x) for x in df["translation"]]
 
 def tokenize(df):
-    df['reference1'] = [[x.split()] for x in df['reference']]
-    df['translation1'] = [x.split() for x in df['translation']]
+    df['reference_token'] = [[x.split()] for x in df['reference']]
+    df['translation_token'] = [x.split() for x in df['translation']]
     return df
 
 def clean(text_list, lemmatize=False, stemmer=False, punctuation = False, stop_words=False, stop = ["a"]):
@@ -62,8 +62,8 @@ def clean(text_list, lemmatize=False, stemmer=False, punctuation = False, stop_w
         text = BeautifulSoup(text, features='lxml').get_text()
         
         #REMOVE STOP WORDS - not needed 
-        if stop_words:
-            text = " ".join([word for word in text.split() if word not in stop])
+        #if stop_words:
+            #text = " ".join([word for word in text.split() if word not in stop])
         
         #LEMMATIZATION
         if lemmatize:
@@ -138,13 +138,13 @@ def run_models(df):
     #gleu_model(df)
 
     # apply NIST model
-    nist(df)
+    #nist(df)
 
     # apply the rouge model
-    rouge(df)
+    #rouge(df)
 
     #apply the bleu-rouge f1 
-    bleu_rouge(df)
+    #bleu_rouge(df)
 
     #apply meteor model
     meteor(df)
