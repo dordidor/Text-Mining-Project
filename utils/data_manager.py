@@ -1,13 +1,5 @@
-import os
 import pandas as pd
 import numpy as np
-import urllib.request
-
-from random import sample, seed
-from shutil import rmtree
-from PIL import Image
-from glob import glob
-
 
 def load_dataset():
     # dataframes provided with the corresponding language translations
