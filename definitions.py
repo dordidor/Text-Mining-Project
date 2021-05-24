@@ -1,5 +1,4 @@
-from mods.models import meteor, nist, rouge, baseline_bleu, bleu_rouge, gleu_model
-
+from mods.models import meteor, nist, baseline_bleu, bleu_rouge, rouge_1, charf, sacre_bleu
 from tqdm import tqdm_notebook as tqdm
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -50,7 +49,7 @@ def clean(text_list, lemmatize=False, stemmer=False, punctuation = False, stop_w
     for j in tqdm(range(len(text_list))):
         
         text = text_list[j]
-        
+
         #LOWERCASE TEXT
         text = text.lower()
         
@@ -134,25 +133,28 @@ def run_models(df):
     # apply baseline bleu model
     baseline_bleu(df)
 
-    # apply google bleu model
-    #gleu_model(df)
+    # apply sacre bleu
+    sacre_bleu(df)
 
     # apply NIST model
     #nist(df)
 
     # apply the rouge model
-    #rouge(df)
+    rouge_1(df)
 
     #apply the bleu-rouge f1 
-    #bleu_rouge(df)
+    bleu_rouge(df)
 
     #apply meteor model
     meteor(df)
 
+    #apply charF
+    charf(df)
+
     return df
 
 def evaluate_models(df): # TODO for laser
-    model_list = ['wordEmbDistance']  # TODO name of column
+    model_list = ['bleu','sacre_bleu','rouge','bleu_rouge','meteor','charf']  
     correl_df = []
     #set indices
     for model in model_list:

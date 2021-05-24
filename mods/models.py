@@ -1,7 +1,8 @@
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
-import nltk.translate.gleu_score as sentence_gleu
+import sacrebleu
 from nltk.translate.meteor_score import meteor_score
-from nltk.translate.nist_score import sentence_nist
+from nltk.translate.nist_score import corpus_nist
+from nltk.translate.chrf_score import sentence_chrf
 #from nltk.tokenize import word_tokenize
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
@@ -35,6 +36,7 @@ def get_tfidf(text, doc):
 
     #generate tf-idf for the given document
     tf_idf_vector = tfidf_vectorizer.transform(cv.transform([doc]))
+    return tf_idf_vector
 
 def extract_feature_scores(feature_names, document_vector):
     """
@@ -76,22 +78,23 @@ def baseline_bleu(df):
     df['bleu'] = df.apply(lambda x: sentence_bleu(x['reference_token'], x['translation_token'], weights=(1,0,0,0), smoothing_function=smoothie), axis=1)
     return df 
 
-def gleu_model(df):
-    df['gleu'] = df.apply(lambda x: sentence_gleu(x['reference_token'], x['translation_token'], weights=(1,0,0,0)), axis=1)
+def sacre_bleu(df):
+    df['sacre_bleu'] = df.apply(lambda x: sacrebleu.corpus_bleu(x['reference'], x['translation']), axis=1).score
     return df 
 
 def nist(df):
     # tokenization happens inside nist
-    df['nist'] = df.apply(lambda x: sentence_nist(x['reference'], x['translation']),axis=1)
+    df['nist'] = df.apply(lambda x: corpus_nist(x['reference'], x['translation']),axis=1)
     return df 
 
 # measures recall
-def rouge(df):
-    df['rouge'] = df.apply(lambda x: Rouge.get_scores(x['translation'], x['reference']),axis=1)
+def rouge_1(df):
+    rouge = Rouge()
+    df['rouge'] = df.apply(lambda x: rouge.get_scores(x['translation'], x['reference'], avg=True)['rouge-1']['f'],axis=1) 
     return df
 
 def bleu_rouge(df):
-    df['bleu_rouge'] = df.apply(lambda x: 2 * (x['bleu'] * x['rouge']) / (x['bleu'] + x['rouge']))
+    df['bleu_rouge'] = 2 * (df['bleu'] * df['rouge']) / (df['bleu'] + df['rouge'])
     return df
 
 def meteor(df):
@@ -103,7 +106,8 @@ def comet(df):
     pass
 
 def charf(df):
-    pass
+    df['charf'] = df.apply(lambda x: sentence_chrf([x['reference']], x['translation']),axis=1)
+    return df
 
 def labse(df, language1, language2):
     tokenizer = BertTokenizerFast.from_pretrained("setu4993/LaBSE")
@@ -121,14 +125,14 @@ def labse(df, language1, language2):
     translation_embeddings = translation_outputs.pooler_output
     return source_embeddings, translation_embeddings
 
-    def similarity(embeddings_1, embeddings_2):
-        normalized_embeddings_1 = F.normalize(embeddings_1, p=2)
-        normalized_embeddings_2 = F.normalize(embeddings_2, p=2)
-        return torch.matmul(
+def similarity(embeddings_1, embeddings_2):
+    normalized_embeddings_1 = F.normalize(embeddings_1, p=2)
+    normalized_embeddings_2 = F.normalize(embeddings_2, p=2)
+    return torch.matmul(
             normalized_embeddings_1, normalized_embeddings_2.transpose(0, 1)
         )
 
-    print(similarity(source_embeddings, translation_embeddings))
+#print(similarity(source_embeddings, translation_embeddings))
 
 
     

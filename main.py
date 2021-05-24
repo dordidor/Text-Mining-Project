@@ -16,8 +16,7 @@ nlp = Chinese.from_config({"nlp": {"tokenizer": cfg}})
 # PKUSeg with "mixed" model provided by pkuseg
 cfg = {"segmenter": "pkuseg"}
 nlp = Chinese.from_config({"nlp": {"tokenizer": cfg}})
-nlp.tokenizer.initialize(pkuseg_model="mixed")
-
+#nlp.tokenizer.initialize(pkuseg_model="mixed")
 
 if __name__ == '__main__':
 
@@ -38,21 +37,19 @@ if __name__ == '__main__':
 
     # preprocess all dataframes
 
+    
     language_list_to_en = language_list[0:-2]
 
     for df in language_list_to_en:
-
-        df = tokenize(df)
-        number_token(df) 
         
-        updates = clean(df["reference_token"], lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
-        update_df(df, updates, "reference_token")
+        updates = clean(df["reference"], lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
+        update_df(df, updates, "reference")
 
-        updates = clean(df["translation_token"], lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
-        update_df(df, updates, "translation_token")
+        updates = clean(df["translation"], lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
+        update_df(df, updates, "translation")
 
-        df['reference'] = df.apply(lambda x: " ".join(x['reference_token']), axis=1)
-        df['translation'] = df.apply(lambda x: " ".join(x['translation_token']), axis=1)
+        number_token(df)
+        df = tokenize(df)
 
         final_df.append(run_models(df))
         correlations.append(evaluate_models(df))  
@@ -65,18 +62,15 @@ if __name__ == '__main__':
 
     #en_zh['reference_token'] = [jieba.cut(x, cut_all=False) for x in df['reference']]
     #en_zh['translation_token'] = [jieba.cut(x, cut_all=False) for x in df['translation']] 
-    
-        df = tokenize(df)
-        number_token(df) 
-        
-        updates = clean(df["reference_token"], lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
+             
+        updates = clean(df["reference_token"].tolist(), lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
         update_df(df, updates, "reference_token")
 
-        updates = clean(df["translation_token"], lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
+        updates = clean(df["translation_token"].tolist(), lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
         update_df(df, updates, "translation_token")
 
-        df['reference'] = df.apply(lambda x: " ".join(x['reference_token']), axis=1)
-        df['translation'] = df.apply(lambda x: " ".join(x['translation_token']), axis=1)
+        number_token(df)
+        df = tokenize(df)
 
         final_df.append(run_models(df))
         correlations.append(evaluate_models(df)) 
