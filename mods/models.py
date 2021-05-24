@@ -79,7 +79,7 @@ def baseline_bleu(df):
     return df 
 
 def sacre_bleu(df):
-    df['sacre_bleu'] = df.apply(lambda x: sacrebleu.corpus_bleu(x['reference'], x['translation']), axis=1).score
+    df['sacre_bleu'] = df.apply(lambda x: sacrebleu.corpus_bleu(x['reference'], x['translation']).score, axis=1)
     return df 
 
 def nist(df):

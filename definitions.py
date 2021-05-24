@@ -159,7 +159,7 @@ def evaluate_models(df): # TODO for laser
     #set indices
     for model in model_list:
         reg = RegressionReport()
-        correl_df[model] = reg.compute(df[model], df['z-score'])
+        correl_df = reg.compute(df[model], df['z-score'])
 
     return correl_df
 
