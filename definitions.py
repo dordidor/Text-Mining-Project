@@ -11,12 +11,19 @@ from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from metrics import *
 import string
 
-#stop_en = set(stopwords.words('english'))
-#stop_fi = set(stopwords.words('finnish'))
-# stop_zh = chinese library needed 
+stop_en = set(stopwords.words('english'))
+stop_fi = set(stopwords.words('finnish'))
+stop_zh = []
 exclude = set(string.punctuation)
 lemma = WordNetLemmatizer()
 snowball_stemmer = SnowballStemmer('english')
+
+
+def remove_empty(df):
+    df = df.replace(r'^\s*$', np.NaN, regex=True)
+    df = df.dropna()
+    return df
+
 
 def number_token(df):
 
@@ -32,10 +39,12 @@ def number_token(df):
     df["reference"] = [transform_number(x) for x in df["reference"]]
     df["translation"] = [transform_number(x) for x in df["translation"]]
 
+
 def tokenize(df):
     df['reference_token'] = [[x.split()] for x in df['reference']]
     df['translation_token'] = [x.split() for x in df['translation']]
     return df
+
 
 def clean(text_list, lower = False, lemmatize=False, stemmer=False, punctuation = True, stop_words=False, stop = ["a"]):
     """
@@ -77,6 +86,7 @@ def clean(text_list, lower = False, lemmatize=False, stemmer=False, punctuation 
         
     return updates
 
+
 def update_df(dataframe, list_updated, column):
     return dataframe.update(pd.DataFrame({column: list_updated}))
 
@@ -91,12 +101,14 @@ def total_word_freq(text_list):
     freq = pd.Series(words_in_df).value_counts()
     return freq
 
+
 # Fetch wordcount for each column
 def word_count(df):
     word_count_ref  = df['reference'].apply(lambda x: len(str(x).split(" ")))
     word_count_tra  = df['translation'].apply(lambda x: len(str(x).split(" ")))
     df['word_count_ref'] = word_count_ref
     df['word_count_tra'] = word_count_tra
+
 
 def get_top_n_grams(corpus, top_k, n):
     """
@@ -127,6 +139,7 @@ def get_top_n_grams(corpus, top_k, n):
     top_df.columns = ["Ngram", "Freq"]
     return top_df
 
+
 def run_models(df):
     # get word count for each of reference and translation
     word_count(df)
@@ -154,6 +167,7 @@ def run_models(df):
 
     return df
 
+
 def evaluate_models(df): # TODO for laser
     model_list = ['bleu','sacre_bleu','rouge','bleu_rouge','meteor','charf']  
     correl_df = pd.DataFrame()
@@ -163,6 +177,7 @@ def evaluate_models(df): # TODO for laser
         correl_df[model] = reg.compute(df[model], df['z-score'])
 
     return correl_df
+
 
 def plot_correl(df,column):
     pyplot.scatter(df['z-score'], df[column])

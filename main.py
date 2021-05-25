@@ -1,15 +1,6 @@
 from definitions import *
 from utils.data_manager import *
-from spacy.lang.zh import Chinese
-from spacy.lang.fi import Finnish
-from nltk.corpus import stopwords
 
-stop_en = set(stopwords.words('english'))
-
-def remove_empty(df):
-    df = df.replace(r'^\s*$', np.NaN, regex=True)
-    df = df.dropna()
-    return df
 
 if __name__ == '__main__':
 
@@ -54,9 +45,25 @@ if __name__ == '__main__':
 
         print("Running models for "+ list_of_names[name])
         final_df.append(run_models(df))
-        correlations.append(evaluate_models(df))  
+        correlations.append(evaluate_models(df))
 
-    
+    # To Chinese section
+    preprocess_config["stop"] = stop_zh
+
+    language_list[-1]['reference_token'] = [jieba.cut(x, cut_all=False) for x in language_list[-1]['reference']]
+    language_list[-1]['translation_token'] = [jieba.cut(x, cut_all=False) for x in language_list[-1]['translation']]
+
+    # To Finnish section
+    preprocess_config["stop"] = stop_fi
+    updates = clean(language_list[-2]["reference_token"].tolist(), lemmatize=preprocess_config['lemmatize'],
+                    stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'],
+                    stop=preprocess_config['stop'])
+    update_df(language_list[-2], updates, "reference_token")
+
+    updates = clean(language_list[-2]["translation_token"].tolist(), lemmatize=preprocess_config['lemmatize'],
+                    stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'],
+                    stop=preprocess_config['stop'])
+    update_df(language_list[-2], updates, "translation_token")
 
 
 
