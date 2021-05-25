@@ -6,7 +6,7 @@ from nltk.corpus import stopwords
 
 stop_en = set(stopwords.words('english'))
 
-def new_func(df):
+def remove_empty(df):
     df = df.replace(r'^\s*$', np.NaN, regex=True)
     df = df.dropna()
     return df
@@ -17,6 +17,7 @@ if __name__ == '__main__':
     preprocess_config = {
         'lemmatize': False,
         'stemmer': False,
+        'punctuation': True,
         'stop_words': False,
         'stop': stop_en
         # lowercase
@@ -30,11 +31,14 @@ if __name__ == '__main__':
 
     # preprocess all dataframes
 
-    language_list_to_en = language_list[0:-2]
+    language_list_to_en = language_list[2:3]
 
-    for df in language_list_to_en:
-        
-        df = new_func(df)
+    list_of_names = ['cs-en', 'de-en', 'ru-en', 'zh-en', 'en-fi', 'en-zh']
+
+    for name, df in enumerate(language_list_to_en):
+
+        df_size = df.shape[0]
+        print ("Cleaning "+ list_of_names[name])
 
         updates = clean(df["reference"], lower = True, lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
         update_df(df, updates, "reference")
@@ -42,38 +46,17 @@ if __name__ == '__main__':
         updates = clean(df["translation"], lower = True, lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
         update_df(df, updates, "translation")
 
+        df = remove_empty(df)
+        print(df.shape[0]/df_size)
+
         number_token(df)
         df = tokenize(df)
 
+        print("Running models for "+ list_of_names[name])
         final_df.append(run_models(df))
         correlations.append(evaluate_models(df))  
 
-    ### preprocess chinese and finnish dataframe
-
-    en_zh = pd.read_csv("corpus/en-zh/scores.csv")
-    en_fi = pd.read_csv("corpus/en-fi/scores.csv")
-
-    language_list_from_english = language_list[-1:-3]
-
-    #for df in language_list_from_english:
-
-        #df = new_func(df)
-             
-        #updates = clean(df["reference"].tolist(), lower = True, lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
-        #update_df(df, updates, "reference")
-
-        #updates = clean(df["translation"].tolist(), lower = True, lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
-        #update_df(df, updates, "translation")
-
-        #number_token(df)
-        #df = tokenize(df)
-
-        #en_zh['reference_token'] = [jieba.cut(x, cut_all=False) for x in df['reference']]
-        #en_zh['translation_token'] = [jieba.cut(x, cut_all=False) for x in df['translation']] 
-
-        #final_df.append(run_models(df))
-        #correlations.append(evaluate_models(df)) 
-
+    
 
 
 

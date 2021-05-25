@@ -37,7 +37,7 @@ def tokenize(df):
     df['translation_token'] = [x.split() for x in df['translation']]
     return df
 
-def clean(text_list, lower = False, lemmatize=False, stemmer=False, punctuation = False, stop_words=False, stop = ["a"]):
+def clean(text_list, lower = False, lemmatize=False, stemmer=False, punctuation = True, stop_words=False, stop = ["a"]):
     """
     Function that a receives a list of strings and preprocesses it.
     
@@ -51,11 +51,12 @@ def clean(text_list, lower = False, lemmatize=False, stemmer=False, punctuation 
         text = text_list[j]
 
         #LOWERCASE TEXT
-        text = text.lower()
+        if lower:
+            text = text.lower()
         
         #REMOVE NUMERICAL DATA AND PUNCTUATION
         if punctuation:
-            text = re.sub("[^a-zA-Z]", ' ', text)
+            text = re.sub("[^a-zA-Z]", '', text)
         
         #REMOVE TAGS (HTML)
         text = BeautifulSoup(text, features='lxml').get_text()

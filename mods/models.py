@@ -104,7 +104,6 @@ def meteor(df):
     #If no words match during the method returns the score of 0
     return df
 
-
 def charf(df):
     df['charf'] = df.apply(lambda x: sentence_chrf([x['reference']], x['translation']),axis=1)
     return df
@@ -138,6 +137,7 @@ def comet(df):
     pass
 
 def word_mover_distance(df):
+    
     df['wmd'] = df.apply(lambda x: model.wmdistance([x['reference']], x['translation']),axis=1)
     return df
 
