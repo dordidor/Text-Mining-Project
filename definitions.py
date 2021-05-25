@@ -47,7 +47,7 @@ def tokenize(df):
     return df
 
 
-def clean_data(text_list, lower = False, lemmatize=False, stemmer=False, punctuation = True, stop_words=False, stop = ["a"]):
+def clean(text_list, lower = False, lemmatize=False, stemmer=False, punctuation = True, stop_words=False, stop = ["a"]):
     """
     Function that a receives a list of strings and preprocesses it.
     :param text_list: List of strings.

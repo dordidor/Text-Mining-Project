@@ -16,14 +16,14 @@ def run_word_embedding(df, name):
     word2idx = {w: idx for (idx, w) in enumerate(vocabulary)}
 
     # load word embeddings 
-    W1 = np.load('corpus/'+ name +'/laser.reference_embeds.npy')
-    W2 = np.load('corpus/'+ name +'/laser.source_embeds.npy')
+    W1 = np.load('corpus/'+ str(name) +'/laser.reference_embeds.npy')
+    W2 = np.load('corpus/'+ str(name) +'/laser.translation_embeds.npy')
 
     #training_pairs = build_word_embedding_training(tokenized_corpus, word2idx)
 
     #W1, W2, losses = Skip_Gram(training_pairs, word2idx, epochs=2)
 
-    W = W1 + torch.t(W2)
+    W = torch.from_numpy(W1) + torch.from_numpy(W2)
     W = (torch.t(W)/2).clone().detach()
 
 
@@ -113,38 +113,7 @@ def Skip_Gram(training_pairs, vocabulary, embedding_dims=5, learning_rate=0.001,
 
     return W1, W2, losses
 
-from utils.data_manager import load_dataset
-from definitions import clean, number_token, update_df,evaluate_models
+
 if __name__ == '__main__':
-    language_list = load_dataset(0)
-    stop_en =["a"]
-    preprocess_config = {
-        'lemmatize': False,
-        'stemmer': False,
-        'stop_words': False,
-        'stop': stop_en
-        # lowercase
-        # remove punctuation
-        }
-    df = language_list[1]
-
-
-    df["reference"] = [number_token(x) for x in df["reference"]]
-    df["translation"] = [number_token(x) for x in df["translation"]]
-
-    updates = clean(df["reference"],
-                    lemmatize=preprocess_config['lemmatize'],
-                    stemmer=preprocess_config['lemmatize'],
-                    stop_words=preprocess_config['lemmatize'],
-                    stop=preprocess_config['stop'])
-
-    update_df(df, updates, "reference")
-
-    updates = clean(df["translation"],
-                    lemmatize=preprocess_config['lemmatize'],
-                    stemmer=preprocess_config['lemmatize'],
-                    stop_words=preprocess_config['lemmatize'],
-                    stop=preprocess_config['stop'])
-    update_df(df, updates, "translation")
-    df = get_word_embedding(df)
-    print(evaluate_models(df))
+    a = np.load('../corpus/' + str("de-en") + '/laser.translation_embeds.npy')
+    1+1
