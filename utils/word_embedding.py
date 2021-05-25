@@ -7,12 +7,12 @@ from sklearn.metrics.pairwise import euclidean_distances
 
 
 def get_word_embedding(df):
-    df['reference1'] = [[x.split()] for x in df['reference']]
-    df['translation1'] = [x.split() for x in df['translation']]
+    df['reference'] = [[x.split()] for x in df['reference']]
+    df['translation'] = [x.split() for x in df['translation']]
 
     tokenized_corpus = []
-    [tokenized_corpus.append(word) for doc in df['reference1'] for word in doc]
-    [tokenized_corpus.append(word) for doc in df['translation1'] for word in doc]
+    [tokenized_corpus.append(word) for doc in df['reference'] for word in doc]
+    [tokenized_corpus.append(word) for doc in df['translation'] for word in doc]
     vocabulary = {word for doc in tokenized_corpus for word in doc}
 
     word2idx = {w: idx for (idx, w) in enumerate(vocabulary)}
@@ -23,7 +23,11 @@ def get_word_embedding(df):
     W = W1 + torch.t(W2)
     W = (torch.t(W)/2).clone().detach()
 
-    df['wordEmbDistance'] = get_word_embedding_distance(W, word2idx, df['reference1'], df['translation1'])
+    # load word embeddings 
+    #ref_embedding = np.load('corpus/de-en/laser.reference_embeds.npy')
+    #source_embedding = np.load('corpus/de-en/laser.source_embeds.npy')
+
+    df['wordEmbDistance'] = get_word_embedding_distance(W, word2idx, df['reference'], df['translation'])
     print(df)
     return df
 
@@ -109,7 +113,7 @@ def Skip_Gram(training_pairs, vocabulary, embedding_dims=5, learning_rate=0.001,
 
     return W1, W2, losses
 
-from data_manager import load_dataset
+from utils.data_manager import load_dataset
 from definitions import clean, number_token, update_df,evaluate_models
 if __name__ == '__main__':
     language_list = load_dataset(0)

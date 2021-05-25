@@ -37,7 +37,7 @@ def tokenize(df):
     df['translation_token'] = [x.split() for x in df['translation']]
     return df
 
-def clean(text_list, lemmatize=False, stemmer=False, punctuation = False, stop_words=False, stop = ["a"]):
+def clean(text_list, lower = False, lemmatize=False, stemmer=False, punctuation = False, stop_words=False, stop = ["a"]):
     """
     Function that a receives a list of strings and preprocesses it.
     
@@ -155,11 +155,11 @@ def run_models(df):
 
 def evaluate_models(df): # TODO for laser
     model_list = ['bleu','sacre_bleu','rouge','bleu_rouge','meteor','charf']  
-    correl_df = []
+    correl_df = pd.DataFrame()
     #set indices
     for model in model_list:
         reg = RegressionReport()
-        correl_df = reg.compute(df[model], df['z-score'])
+        correl_df[model] = reg.compute(df[model], df['z-score'])
 
     return correl_df
 
