@@ -44,7 +44,7 @@ if __name__ == '__main__':
         df = tokenize(df)
 
         print("Running models for "+ list_of_names[name])
-        final_df.append(run_models(df))
+        final_df.append(run_models(df,name))
         correlations.append(evaluate_models(df))
 
     # To Chinese section

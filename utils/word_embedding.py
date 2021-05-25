@@ -6,26 +6,26 @@ import numpy as np
 from sklearn.metrics.pairwise import euclidean_distances
 
 
-def get_word_embedding(df):
-    df['reference'] = [[x.split()] for x in df['reference']]
-    df['translation'] = [x.split() for x in df['translation']]
+def run_word_embedding(df, name):
 
     tokenized_corpus = []
-    [tokenized_corpus.append(word) for doc in df['reference'] for word in doc]
-    [tokenized_corpus.append(word) for doc in df['translation'] for word in doc]
+    [tokenized_corpus.append(word) for doc in df['reference_token'] for word in doc]
+    [tokenized_corpus.append(word) for doc in df['translation_token'] for word in doc]
     vocabulary = {word for doc in tokenized_corpus for word in doc}
 
     word2idx = {w: idx for (idx, w) in enumerate(vocabulary)}
-    training_pairs = build_word_embedding_training(tokenized_corpus, word2idx)
 
-    W1, W2, losses = Skip_Gram(training_pairs, word2idx, epochs=2)
+    # load word embeddings 
+    W1 = np.load('corpus/'+ name +'/laser.reference_embeds.npy')
+    W2 = np.load('corpus/'+ name +'/laser.source_embeds.npy')
+
+    #training_pairs = build_word_embedding_training(tokenized_corpus, word2idx)
+
+    #W1, W2, losses = Skip_Gram(training_pairs, word2idx, epochs=2)
 
     W = W1 + torch.t(W2)
     W = (torch.t(W)/2).clone().detach()
 
-    # load word embeddings 
-    #ref_embedding = np.load('corpus/de-en/laser.reference_embeds.npy')
-    #source_embedding = np.load('corpus/de-en/laser.source_embeds.npy')
 
     df['wordEmbDistance'] = get_word_embedding_distance(W, word2idx, df['reference'], df['translation'])
     print(df)
