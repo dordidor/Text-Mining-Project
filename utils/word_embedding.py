@@ -9,15 +9,19 @@ from sklearn.metrics.pairwise import euclidean_distances
 def run_word_embedding(df, name):
 
     tokenized_corpus = []
-    [tokenized_corpus.append(word) for doc in df['reference_token'] for word in doc]
-    [tokenized_corpus.append(word) for doc in df['translation_token'] for word in doc]
-    vocabulary = {word for doc in tokenized_corpus for word in doc}
 
-    word2idx = {w: idx for (idx, w) in enumerate(vocabulary)}
+    tokenized_corpus = [x for i, y in df['reference_token'].apply(list).iteritems() for x in y]
+    tokenized_corpus = [word for sent in tokenized_corpus for word in sent]
+    tokenized_corpus = [word for sent in df['translation_token'] for word in sent]
+    #[tokenized_corpus.append(word) for doc in df['reference_token'] for word in doc]
+    #[tokenized_corpus.append(word) for word in df['translation_token']]
+    #vocabulary = {word for doc in tokenized_corpus for word in doc}
+
+    word2idx = {w: idx for (idx, w) in enumerate(set(tokenized_corpus))}
 
     # load word embeddings 
-    W1 = np.load('corpus/'+ str(name) +'/laser.reference_embeds.npy')
-    W2 = np.load('corpus/'+ str(name) +'/laser.translation_embeds.npy')
+    W1 = np.load('../corpus/'+ str(name) +'/laser.reference_embeds.npy')
+    W2 = np.load('../corpus/'+ str(name) +'/laser.translation_embeds.npy')
 
     #training_pairs = build_word_embedding_training(tokenized_corpus, word2idx)
 
@@ -26,8 +30,7 @@ def run_word_embedding(df, name):
     W = torch.from_numpy(W1) + torch.from_numpy(W2)
     W = (torch.t(W)/2).clone().detach()
 
-
-    df['wordEmbDistance'] = get_word_embedding_distance(W, word2idx, df['reference'], df['translation'])
+    df['wordEmbDistance'] = get_word_embedding_distance(W, word2idx, df['reference_token'], df['translation_token'])
     print(df)
     return df
 
@@ -42,7 +45,7 @@ def get_word_embedding_distance(W, word2idx, reference, translation):
 
 def apply_word_embedding_distance(W, word2idx, sentence1, sentence2):
     distance = 0
-    for word1 in sentence1:
+    for word1 in sentence1[0]:
         for word2 in sentence2:
             distance += euclidean_distances([W[word2idx[word1]].numpy()], [W[word2idx[word2]].numpy()])
     return distance
@@ -113,7 +116,40 @@ def Skip_Gram(training_pairs, vocabulary, embedding_dims=5, learning_rate=0.001,
 
     return W1, W2, losses
 
-
+"""from data_manager import load_dataset
+from definitions import *"""
 if __name__ == '__main__':
-    a = np.load('../corpus/' + str("de-en") + '/laser.translation_embeds.npy')
-    1+1
+
+    preprocess_config = {
+        'lemmatize': False,
+        'stemmer': False,
+        'punctuation': False,
+        'stop_words': False,
+        'stop': stop_en
+        # lowercase
+        # remove punctuation
+    }
+
+    df = pd.read_csv("../corpus/cs-en/scores.csv")
+
+    updates = clean(df["reference"],
+                    lower=True,
+                    lemmatize=preprocess_config['lemmatize'],
+                    stemmer=preprocess_config['stemmer'],
+                    stop_words=preprocess_config['stop_words'],
+                    stop=preprocess_config['stop'])
+    update_df(df, updates, "reference")
+
+    updates = clean(df["translation"], lower=True,
+                    lemmatize=preprocess_config['lemmatize'],
+                    stemmer=preprocess_config['stemmer'],
+                    stop_words=preprocess_config['stop_words'],
+                    stop=preprocess_config['stop'])
+    update_df(df, updates, "translation")
+
+    number_token(df)
+    df = tokenize(df)
+
+    df = remove_empty(df)
+
+    run_word_embedding(df, "cs-en")

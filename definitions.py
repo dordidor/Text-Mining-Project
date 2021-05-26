@@ -65,7 +65,7 @@ def clean(text_list, lower = False, lemmatize=False, stemmer=False, punctuation 
         
         #REMOVE NUMERICAL DATA AND PUNCTUATION
         if punctuation:
-            text = re.sub("[^a-zA-Z]", '', text)
+            text = re.sub(r"[^\w\s]", '', text)
         
         #REMOVE TAGS (HTML)
         text = BeautifulSoup(text, features='lxml').get_text()
@@ -163,7 +163,7 @@ def run_models(df, name):
     charf(df)
 
     #apply word embedding
-    run_word_embedding(df, name)
+    #run_word_embedding(df, name)
 
     return df
 
