@@ -11,6 +11,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from metrics import *
 import string
+import numpy as np
 
 stop_en = set(stopwords.words('english'))
 stop_fi = set(stopwords.words('finnish'))
@@ -167,16 +168,21 @@ def run_models(df, name):
 
     return df
 
+
 def evaluate_models(df): # TODO for laser
-    model_list = ['bleu','sacre_bleu','rouge','bleu_rouge','meteor','charf']  
+    model_list = ['bleu', 'sacre_bleu','rouge','bleu_rouge','meteor','charf']
     correl_df = pd.DataFrame()
     #set indices
     for model in model_list:
-        reg = RegressionReport()
-        correl_df[model] = reg.compute(df[model], df['z-score'])
+        correlations = compute_all_corr(df[model], df['z-score'])
+        corr_dict = {"kendall": correlations[0].item(),
+                     "pearson": correlations[1].item(),
+                     "spearman": correlations[2].item()}
+        correl_df[model] = pd.Series(corr_dict)
 
     return correl_df
 
-def plot_correl(df,column):
+
+def plot_correl(df, column):
     pyplot.scatter(df['z-score'], df[column])
     pyplot.show()
