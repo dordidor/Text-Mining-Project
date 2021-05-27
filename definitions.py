@@ -1,4 +1,4 @@
-from mods.models import meteor, nist, baseline_bleu, bleu_rouge, rouge_1, charf, sacre_bleu
+from mods.models import wer_model, meteor, nist, baseline_bleu, bleu_rouge, rouge_1, charf, sacre_bleu
 from tqdm import tqdm_notebook as tqdm
 from nltk.corpus import stopwords
 from nltk.stem.wordnet import WordNetLemmatizer
@@ -28,14 +28,13 @@ def remove_empty(df):
 
 
 def number_token(df):
-
     def transform_number(text):
         """
         Function that receives a string of text and returns the string with 
         the cost formats within it substituted by the token #COST
         """
-        tokenized_text = re.sub('(\d+|\d+.\d+)(| )','##',text)
-            
+        tokenized_text = re.sub('(\d+|\d+.\d+)(| )', '##', text)
+
         return tokenized_text
 
     df["reference"] = [transform_number(x) for x in df["reference"]]
@@ -48,7 +47,7 @@ def tokenize(df):
     return df
 
 
-def clean(text_list, lower = False, lemmatize=False, stemmer=False, punctuation = True, stop_words=False, stop = ["a"]):
+def clean(text_list, lower=False, lemmatize=False, stemmer=False, punctuation=True, stop_words=False, stop=["a"]):
     """
     Function that a receives a list of strings and preprocesses it.
     :param text_list: List of strings.
@@ -57,33 +56,33 @@ def clean(text_list, lower = False, lemmatize=False, stemmer=False, punctuation 
     """
     updates = []
     for j in tqdm(range(len(text_list))):
-        
+
         text = text_list[j]
 
-        #LOWERCASE TEXT
+        # LOWERCASE TEXT
         if lower:
             text = text.lower()
-        
-        #REMOVE NUMERICAL DATA AND PUNCTUATION
+
+        # REMOVE NUMERICAL DATA AND PUNCTUATION
         if punctuation:
             text = re.sub(r"[^\w\s]", '', text)
-        
-        #REMOVE TAGS (HTML)
+
+        # REMOVE TAGS (HTML)
         text = BeautifulSoup(text, features='lxml').get_text()
-        
-        #REMOVE STOP WORDS - not needed 
-        #if stop_words:
-            #text = " ".join([word for word in text.split() if word not in stop])
-        #LEMMATIZATION
+
+        # REMOVE STOP WORDS - not needed
+        # if stop_words:
+        # text = " ".join([word for word in text.split() if word not in stop])
+        # LEMMATIZATION
         if lemmatize:
             text = " ".join(lemma.lemmatize(word) for word in text.split())
-        
-        #STEMMER
+
+        # STEMMER
         if stemmer:
             text = " ".join(snowball_stemmer.stem(word) for word in text.split())
-        
+
         updates.append(text)
-        
+
     return updates
 
 
@@ -104,8 +103,8 @@ def total_word_freq(text_list):
 
 # Fetch wordcount for each column
 def word_count(df):
-    word_count_ref  = df['reference'].apply(lambda x: len(str(x).split(" ")))
-    word_count_tra  = df['translation'].apply(lambda x: len(str(x).split(" ")))
+    word_count_ref = df['reference'].apply(lambda x: len(str(x).split(" ")))
+    word_count_tra = df['translation'].apply(lambda x: len(str(x).split(" ")))
     df['word_count_ref'] = word_count_ref
     df['word_count_tra'] = word_count_tra
 
@@ -123,15 +122,15 @@ def get_top_n_grams(corpus, top_k, n):
         the respective counts
     """
     vec = CountVectorizer(ngram_range=(n, n), max_features=2000).fit(corpus)
-    
+
     bag_of_words = vec.transform(corpus)
-    
-    sum_words = bag_of_words.sum(axis=0) 
-    
+
+    sum_words = bag_of_words.sum(axis=0)
+
     words_freq = []
     for word, idx in vec.vocabulary_.items():
         words_freq.append((word, sum_words[0, idx]))
-        
+
     words_freq = sorted(words_freq, key=lambda x: x[1], reverse=True)
     top_df = pd.DataFrame(words_freq[:top_k])
     top_df.columns = ["Ngram", "Freq"]
@@ -142,6 +141,9 @@ def run_models(df, name):
     # get word count for each of reference and translation
     word_count(df)
 
+    # apply word error rate
+    wer_model
+
     # apply baseline bleu model
     baseline_bleu(df)
 
@@ -149,30 +151,30 @@ def run_models(df, name):
     sacre_bleu(df)
 
     # apply NIST model
-    #nist(df)
+    nist(df)
 
     # apply the rouge model
     rouge_1(df)
 
-    #apply the bleu-rouge f1 
+    # apply the bleu-rouge f1
     bleu_rouge(df)
 
-    #apply meteor model
+    # apply meteor model
     meteor(df)
 
-    #apply charF
+    # apply charF
     charf(df)
 
-    #apply word embedding
-    #run_word_embedding(df, name)
+    # apply word embedding
+    # run_word_embedding(df, name)
 
     return df
 
 
-def evaluate_models(df): # TODO for laser
-    model_list = ['bleu', 'sacre_bleu','rouge','bleu_rouge','meteor','charf']
+def evaluate_models(df):  # TODO for laser
+    model_list = ['wer_model', 'bleu', 'sacre_bleu', 'rouge', 'bleu_rouge', 'meteor', 'charf']
     correl_df = pd.DataFrame()
-    #set indices
+    # set indices
     for model in model_list:
         correlations = compute_all_corr(df[model], df['z-score'])
         corr_dict = {"kendall": correlations[0].item(),
