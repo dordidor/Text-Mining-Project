@@ -141,14 +141,17 @@ def run_models(df, name):
     # get word count for each of reference and translation
     word_count(df)
 
-    # apply word error rate
-    wer_model
-
     # apply baseline bleu model
     baseline_bleu(df)
 
     # apply sacre bleu
     sacre_bleu(df)
+
+    # apply meteor model
+    meteor(df)
+
+    # apply word error rate
+    wer_model(df)
 
     # apply NIST model
     # nist(df)
@@ -158,9 +161,6 @@ def run_models(df, name):
 
     # apply the bleu-rouge f1
     bleu_rouge(df)
-
-    # apply meteor model
-    meteor(df)
 
     # apply charF
     charf(df)
@@ -172,7 +172,7 @@ def run_models(df, name):
 
 
 def evaluate_models(df):  # TODO for laser
-    model_list = ['wer_model', 'bleu', 'sacre_bleu', 'rouge', 'bleu_rouge', 'meteor', 'charf']
+    model_list = ['bleu', 'sacre_bleu', 'meteor', 'wer', 'rouge', 'bleu_rouge', 'charf']
     correl_df = pd.DataFrame()
     # set indices
     for model in model_list:

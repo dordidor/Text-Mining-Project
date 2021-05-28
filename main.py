@@ -31,10 +31,10 @@ if __name__ == '__main__':
 
         print("Cleaning " + list_of_names[name])
 
-        updates = clean(df["reference"], lower = True, lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
+        updates = clean(df["reference"], lower=True, lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
         update_df(df, updates, "reference")
 
-        updates = clean(df["translation"], lower = True, lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
+        updates = clean(df["translation"], lower=True, lemmatize=preprocess_config['lemmatize'], stemmer=preprocess_config['stemmer'], stop_words=preprocess_config['stop_words'], stop=preprocess_config['stop'])
         update_df(df, updates, "translation")
 
         df = remove_empty(df)
@@ -84,4 +84,5 @@ if __name__ == '__main__':
 
     for i in range(len(correlations)):
         print("Correlations for", list_of_names[i])
+        correlations[i].to_csv("results/" + list_of_names[i] + "_config1.csv")
         print(correlations[i])
