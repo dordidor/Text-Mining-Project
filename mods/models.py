@@ -1,7 +1,7 @@
 from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
 import sacrebleu
 from nltk.translate.meteor_score import meteor_score
-from nltk.translate.nist_score import corpus_nist
+from nltk.translate.nist_score import sentence_nist
 from nltk.translate.chrf_score import sentence_chrf
 # from nltk.tokenize import word_tokenize
 from sklearn.metrics.pairwise import cosine_similarity
@@ -98,7 +98,7 @@ def sacre_bleu(df):
 
 def nist(df):
     # tokenization happens inside nist
-    df['nist'] = df.apply(lambda x: corpus_nist(x['reference'], x['translation']), axis=1)
+    df['nist'] = df.apply(lambda x: sentence_nist(x['reference'], x['translation']), axis=1)
     return df
 
 
@@ -156,7 +156,7 @@ def difference(embeddings_1, embeddings_2):
     return embeddings_1 - embeddings_2
 
 
-def comet(df):
+def bert_score(df):
     pass
 
 

@@ -151,7 +151,7 @@ def run_models(df, name):
     sacre_bleu(df)
 
     # apply NIST model
-    nist(df)
+    # nist(df)
 
     # apply the rouge model
     rouge_1(df)
